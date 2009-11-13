@@ -109,7 +109,12 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
           }
           break;
         case BundleEvent.STOPPING:
-          
+          if (event.getBundle() == currentProviderOfSlf4jImpl) {
+            //uninstall
+            System.err.println("uninstalling the current slf4jimpl provided by bundle "
+                + currentProviderOfSlf4jImpl.getSymbolicName());
+            uninstallSlf4jImpl();
+          }
           break;
         }
       }
@@ -145,6 +150,12 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
   private boolean setupSlf4jImpl(PackageAdmin packageAdmin) {
     Bundle slf4jImpl = discoverAndInstallSlf4jImpl(packageAdmin);
     return setupSlf4jImpl(slf4jImpl);
+  }
+  
+  private void uninstallSlf4jImpl() {
+    StaticLoggerBinder.setup(null);
+    StaticMDCBinder.setup(null);
+    StaticMarkerBinder.setup(null);
   }
   
   private boolean setupSlf4jImpl(Bundle slf4jImpl) {
