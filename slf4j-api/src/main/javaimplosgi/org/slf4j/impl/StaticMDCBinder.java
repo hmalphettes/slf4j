@@ -9,7 +9,9 @@ import org.slf4j.spi.MDCAdapter;
 
 
 /**
- * Pluggable implementation of StaticMDCBinder
+ * Just a facade for the StaticMDCBinder is actually pluggable.
+ * It is called back by the BundleListener when an implementation of slf4j is started
+ * in the osgi container.
  *
  * @author Hugues Malphettes
  */
@@ -46,8 +48,6 @@ public class StaticMDCBinder implements MDCAdapter {
       
       Method getMDCA = actualMDCBinderClass.getMethod("getMDCA", new Class[0]);
       CURRENT_MDC_ADAPTER = (MDCAdapter) getMDCA.invoke(actualSingleton, null);
-
-
       
     } catch (SecurityException e) {
       e.printStackTrace();

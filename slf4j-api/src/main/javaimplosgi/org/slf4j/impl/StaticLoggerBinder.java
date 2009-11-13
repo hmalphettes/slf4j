@@ -33,6 +33,7 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.helpers.SubstituteLoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
+import org.slf4j.spi.MarkerFactoryBinder;
 
 /**
  * This implementation of the StaticLoggerBinder is actually pluggable.
@@ -67,9 +68,15 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
         + FrameworkUtil.getBundle(actualBinderClass));
     
     try {
-      //static method getSingleton
-      Method getSingleton = actualBinderClass.getMethod("getSingleton", new Class[0]);
-      LoggerFactoryBinder actualSingleton = (LoggerFactoryBinder) getSingleton.invoke(actualBinderClass, null);
+      LoggerFactoryBinder actualSingleton = null;
+      try {
+        Field singleton = actualBinderClass.getField("SINGLETON");
+        actualSingleton = (LoggerFactoryBinder) singleton.get(actualBinderClass);
+      } catch (Throwable t) {
+        Method getSingleton = actualBinderClass.getMethod("getSingleton", new Class[0]);
+        actualSingleton = (LoggerFactoryBinder) getSingleton.invoke(actualBinderClass, null);
+      }
+      
       
       actualClassStr = (String) actualSingleton.getLoggerFactoryClassStr();
       ACTUAL_LOGGER_FACTORY = (ILoggerFactory) actualSingleton.getLoggerFactory();
@@ -95,10 +102,6 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
  
   /**
    * The unique instance of this class.
-   * 
-   * @deprecated Please use the {@link #getSingleton()} method instead of
-   *             accessing this field directly. In future versions, this field
-   *             will become private.
    */
   public static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
   

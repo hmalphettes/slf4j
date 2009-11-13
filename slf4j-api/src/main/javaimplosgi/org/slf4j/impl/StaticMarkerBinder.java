@@ -32,9 +32,9 @@ import org.slf4j.helpers.BasicMarkerFactory;
 import org.slf4j.spi.MarkerFactoryBinder;
 
 /**
- * Just a facade for the StaticMarkerBinder
- * This is very clean thanks to the fact that StaticMarkerBinder classes
- * are required to implement an interface.
+ * Just a facade for the StaticMarkerBinder is actually pluggable.
+ * It is called back by the BundleListener when an implementation of slf4j is started
+ * in the osgi container.
  * 
  * @author Hugues Malphettes
  */
@@ -44,7 +44,6 @@ public class StaticMarkerBinder implements MarkerFactoryBinder {
    * The unique instance of this class.
    */
   public static final StaticMarkerBinder SINGLETON = new StaticMarkerBinder();
-  
   
   private static final MarkerFactoryBinder DefaultMarkerFactoryBinder = new MarkerFactoryBinder() {
     private BasicMarkerFactory basic = new BasicMarkerFactory();
