@@ -33,7 +33,6 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.helpers.SubstituteLoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
-import org.slf4j.spi.MarkerFactoryBinder;
 
 /**
  * This implementation of the StaticLoggerBinder is actually pluggable.
@@ -47,11 +46,11 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
   
   /**
    * Declare the version of the SLF4J API this implementation is compiled against. 
-   * The value of this field is read on the actual implementation.
+   * This value is in fact by default read on the bundle's version for slf4j-api
+   * and once set to an actual implementation delegated to that version.
    */
-  public static String REQUESTED_API_VERSION = "1.5.9.RC1";
+  public static String REQUESTED_API_VERSION = "1.5.9";
   
-
   /**
    * Use Introspection to set the ILoggerFactory and the REQUESTED_API_VERSION
    * @param actualBinderClass
@@ -60,7 +59,7 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
     if (actualBinderClass == null) {
       actualClassStr = "org.slf4j.helpers.SubstituteLoggerFactory";
       ACTUAL_LOGGER_FACTORY = new SubstituteLoggerFactory();
-      REQUESTED_API_VERSION = "1.5.9.RC1";
+      REQUESTED_API_VERSION = getDefaultVersion();
       return;
     }
     
@@ -99,6 +98,11 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
       e.printStackTrace();
     }
   }
+  
+  private static String getDefaultVersion() {
+    return FrameworkUtil.getBundle(PluggableSlf4jImplSupportBundleActivator.class)
+        .getVersion().toString();
+  }
  
   /**
    * The unique instance of this class.
@@ -114,7 +118,8 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
     return SINGLETON;
   }
   
-  public StaticLoggerBinder() {
+  private StaticLoggerBinder() {
+    REQUESTED_API_VERSION = getDefaultVersion();
   }
 
   public String getLoggerFactoryClassStr() {
