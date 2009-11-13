@@ -1,11 +1,11 @@
 Implementation-Title: slf4j-api-osgi
-Bundle-Description: Support for pluggable slf4j-implementations that are packaged as osgi bundles
+Bundle-Description: Support for pluggable slf4j-implementations packaged as osgi bundles
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: slf4j.api.osgi
 Fragment-Host: slf4j.api
 Bundle-Name: slf4j-api-osgi
 Bundle-Vendor: SLF4J.ORG
-Bundle-Version: 1.5.9
+Bundle-Version: ${parsedVersion.osgiVersion}
 Bundle-RequiredExecutionEnvironment: J2SE-1.3
 Import-Package: org.osgi.framework,
  org.osgi.service.packageadmin
