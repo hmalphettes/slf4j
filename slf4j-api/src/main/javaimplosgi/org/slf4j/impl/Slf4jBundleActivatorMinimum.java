@@ -22,10 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.slf4j.osgi;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.slf4j.impl;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -44,6 +41,8 @@ import org.slf4j.impl.StaticLoggerBinder;
 
 /**
  * Class called when the slf4j-api bundle is started and stoppped.
+ * Please note that as this is in fact packaged in a fragment it is needed to
+ * invoke it from the real BundleActivator of slf4j-api bundle.
  * <p>
  * This implementation is the shortest path to be remove the cyclic dependency
  * as reported in this bug: http://bugzilla.slf4j.org/show_bug.cgi?id=75
@@ -149,6 +148,7 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
   }
   
   private boolean setupSlf4jImpl(Bundle slf4jImpl) {
+    currentProviderOfSlf4jImpl = slf4jImpl;
     if (slf4jImpl == null) {
       return false;
     }
@@ -162,21 +162,21 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
     }
     try {
       Class loggerBinder = slf4jImpl.loadClass("org.slf4j.impl.StaticLoggerBinder");
-      OSGiStaticLoggerBinder.setup(loggerBinder);
+      StaticLoggerBinder.setup(loggerBinder);
     } catch (ClassNotFoundException e) {
       Util.reportFailure("Unable to load org.slf4j.impl.StaticLoggerBinder from bundle " + slf4jImpl.getSymbolicName(), e);
       return false;
     }
     try {
       Class mdcBinder = slf4jImpl.loadClass("org.slf4j.impl.StaticMDCBinder");
-      OSGiStaticMDCBinder.setup(mdcBinder);
+      StaticMDCBinder.setup(mdcBinder);
     } catch (ClassNotFoundException e) {
       Util.reportFailure("Unable to load org.slf4j.impl.StaticMDCBinder from bundle " + slf4jImpl.getSymbolicName(), e);
       return false;
     }
     try {
       Class markerBinder = slf4jImpl.loadClass("org.slf4j.impl.StaticMarkerBinder");
-      OSGiStaticMarkerBinder.setup(markerBinder);
+      StaticMarkerBinder.setup(markerBinder);
     } catch (ClassNotFoundException e) {
       Util.reportFailure("Unable to load org.slf4j.impl.StaticMarkerBinder from bundle " + slf4jImpl.getSymbolicName(), e);
       return false;
@@ -212,7 +212,7 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
     
     //collect the bundles that provide slf4j and can be started.
     //err... right now just take the first one...
-    List slf4jImplProviders = new ArrayList();
+   // List slf4jImplProviders = new ArrayList();
     for (int i = 0; i < implementations.length; i++) {
       ExportedPackage ep = implementations[i];
       Bundle exportingbundle = ep.getExportingBundle();
@@ -241,22 +241,5 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
   private boolean isThisBundle(Bundle bundle) {
     return bundle == FrameworkUtil.getBundle(Slf4jBundleActivatorMinimum.class);
   }
- 
-  private Class load(Bundle slf4jImpl) {
-    if (slf4jImpl.getState() == Bundle.RESOLVED) {
-      try {
-        slf4jImpl.start();
-      } catch (BundleException e) {
-        Util.reportFailure("Unable to start the bundle " + slf4jImpl.getSymbolicName(), e);
-        return null;
-      }
-    }
-    try {
-      return slf4jImpl.loadClass("org.slf4j.impl.StaticLoggerBinder");
-    } catch (ClassNotFoundException e) {
-      Util.reportFailure("Unable to load org.slf4j.impl.StaticLoggerBinder from bundle " + slf4jImpl.getSymbolicName(), e);
-    }
-    return null;
-  }
-  
+   
 }

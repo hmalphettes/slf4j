@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.slf4j.osgi;
+package org.slf4j.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -39,7 +39,7 @@ import org.slf4j.spi.LoggerFactoryBinder;
  * 
  * @author Hugues Malphettes
  */
-public class OSGiStaticLoggerBinder implements LoggerFactoryBinder {
+public class StaticLoggerBinder implements LoggerFactoryBinder {
   
   private static String actualClassStr;
   private static ILoggerFactory ACTUAL_LOGGER_FACTORY = new SubstituteLoggerFactory();
@@ -100,18 +100,18 @@ public class OSGiStaticLoggerBinder implements LoggerFactoryBinder {
    *             accessing this field directly. In future versions, this field
    *             will become private.
    */
-  public static final OSGiStaticLoggerBinder SINGLETON = new OSGiStaticLoggerBinder();
+  public static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
   
   /**
    * Return the singleton of this class.
    * 
    * @return the StaticLoggerBinder singleton
    */
-  public static final OSGiStaticLoggerBinder getSingleton() {
+  public static final StaticLoggerBinder getSingleton() {
     return SINGLETON;
   }
   
-  public OSGiStaticLoggerBinder() {
+  public StaticLoggerBinder() {
   }
 
   public String getLoggerFactoryClassStr() {

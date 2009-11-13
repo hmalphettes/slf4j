@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.slf4j.osgi;
+package org.slf4j.impl;
 
 import java.lang.reflect.Field;
 
@@ -38,12 +38,12 @@ import org.slf4j.spi.MarkerFactoryBinder;
  * 
  * @author Hugues Malphettes
  */
-public class OSGiStaticMarkerBinder implements MarkerFactoryBinder {
+public class StaticMarkerBinder implements MarkerFactoryBinder {
 
   /**
    * The unique instance of this class.
    */
-  public static final OSGiStaticMarkerBinder SINGLETON = new OSGiStaticMarkerBinder();
+  public static final StaticMarkerBinder SINGLETON = new StaticMarkerBinder();
   
   
   private static final MarkerFactoryBinder DefaultMarkerFactoryBinder = new MarkerFactoryBinder() {
@@ -88,7 +88,7 @@ public class OSGiStaticMarkerBinder implements MarkerFactoryBinder {
     }
   }
   
-  private OSGiStaticMarkerBinder() {
+  private StaticMarkerBinder() {
   }
   
   /**

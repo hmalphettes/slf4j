@@ -24,7 +24,6 @@
 
 package org.slf4j;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.slf4j.helpers.BasicMDCAdapter;
@@ -64,40 +63,27 @@ public class MDC {
   static final String NULL_MDCA_URL = "http://www.slf4j.org/codes.html#null_MDCA";
   static final String NO_STATIC_MDC_BINDER_URL = "http://www.slf4j.org/codes.html#no_static_mdc_binder";
   static MDCAdapter mdcAdapter;
-  
+
   private MDC() {
   }
 
   static {
     try {
-      //see if we are inside OSGi.
-      Class.forName("org.osgi.framework.Bundle");
-      //we are in OSGi, plug the 'other' StaticLoggerBinder
-      Class oSGiStaticMarkerBinderClass = MDC.class.getClassLoader().loadClass(
-          "org.slf4j.osgi.OSGiStaticMDCBinder");
-//      mdcAdapter = (MDCAdapter) oSGiStaticMarkerBinderClass.newInstance();
-      Field singleton = oSGiStaticMarkerBinderClass.getField("SINGLETON");
-      mdcAdapter = (MDCAdapter) singleton.get(oSGiStaticMarkerBinderClass);
-    } catch (Throwable t) {
-      //osgi debug
-      t.printStackTrace();
-      try {
-        mdcAdapter = StaticMDCBinder.SINGLETON.getMDCA();
-      } catch (NoClassDefFoundError ncde) {
-        String msg = ncde.getMessage();
-        if (msg != null && msg.indexOf("org/slf4j/impl/StaticMDCBinder") != -1) {
-          Util
-              .reportFailure("Failed to load class \"org.slf4j.impl.StaticMDCBinder\".");
-          Util.reportFailure("See " + NO_STATIC_MDC_BINDER_URL
-              + " for further details.");
-  
-        }
-        throw ncde;
-      } catch (Exception e) {
-        // we should never get here
-        Util.reportFailure("Could not bind with an instance of class ["
-            + StaticMDCBinder.SINGLETON.getMDCAdapterClassStr() + "]", e);
+      mdcAdapter = StaticMDCBinder.SINGLETON.getMDCA();
+    } catch (NoClassDefFoundError ncde) {
+      String msg = ncde.getMessage();
+      if (msg != null && msg.indexOf("org/slf4j/impl/StaticMDCBinder") != -1) {
+        Util
+            .reportFailure("Failed to load class \"org.slf4j.impl.StaticMDCBinder\".");
+        Util.reportFailure("See " + NO_STATIC_MDC_BINDER_URL
+            + " for further details.");
+
       }
+      throw ncde;
+    } catch (Exception e) {
+      // we should never get here
+      Util.reportFailure("Could not bind with an instance of class ["
+          + StaticMDCBinder.SINGLETON.getMDCAdapterClassStr() + "]", e);
     }
   }
 
@@ -116,7 +102,6 @@ public class MDC {
     if (key == null) {
       throw new IllegalArgumentException("key parameter cannot be null");
     }
-
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);
@@ -137,7 +122,7 @@ public class MDC {
     if (key == null) {
       throw new IllegalArgumentException("key parameter cannot be null");
     }
-
+    
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);
@@ -157,7 +142,7 @@ public class MDC {
     if (key == null) {
       throw new IllegalArgumentException("key parameter cannot be null");
     }
-
+    
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);

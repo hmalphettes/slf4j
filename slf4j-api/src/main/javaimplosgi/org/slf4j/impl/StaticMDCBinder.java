@@ -1,4 +1,4 @@
-package org.slf4j.osgi;
+package org.slf4j.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -13,12 +13,12 @@ import org.slf4j.spi.MDCAdapter;
  *
  * @author Hugues Malphettes
  */
-public class OSGiStaticMDCBinder implements MDCAdapter {
+public class StaticMDCBinder implements MDCAdapter {
 
   /**
    * The unique instance of this class.
    */
-  public static final OSGiStaticMDCBinder SINGLETON = new OSGiStaticMDCBinder();
+  public static final StaticMDCBinder SINGLETON = new StaticMDCBinder();
   
 //  private static Object ACTUAL_MDC_BINDER;
   
@@ -62,12 +62,12 @@ public class OSGiStaticMDCBinder implements MDCAdapter {
     }
   }
   
-  public OSGiStaticMDCBinder() {
+  public StaticMDCBinder() {
   }
   
   /**
    * Currently this method always returns an instance of 
-   * {@link OSGiStaticMDCBinder}.
+   * {@link StaticMDCBinder}.
    */
   public MDCAdapter getMDCA() {
     return CURRENT_MDC_ADAPTER;
