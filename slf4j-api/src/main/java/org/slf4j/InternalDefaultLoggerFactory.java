@@ -34,6 +34,7 @@ import java.util.List;
 import org.slf4j.helpers.SubstituteLoggerFactory;
 import org.slf4j.helpers.Util;
 import org.slf4j.impl.StaticLoggerBinder;
+import org.slf4j.spi.LoggerFactoryBinder;
 
 /**
  * Isolate all links from slf4j-api to org.slf4j.impl in this class
@@ -43,7 +44,7 @@ import org.slf4j.impl.StaticLoggerBinder;
  * @author Ceki G&uuml;lc&uuml;
  * @author Robert Elliot
  */
-class InternalDefaultLoggerFactory extends AbstractStaticLoggerBinder {
+class InternalDefaultLoggerFactory implements LoggerFactoryBinder {
   
   static final String NO_STATICLOGGERBINDER_URL = "http://www.slf4j.org/codes.html#StaticLoggerBinder";
   static final String MULTIPLE_BINDINGS_URL = "http://www.slf4j.org/codes.html#multiple_bindings";
@@ -265,6 +266,14 @@ class InternalDefaultLoggerFactory extends AbstractStaticLoggerBinder {
       return TEMP_FACTORY;
     }
     throw new IllegalStateException("Unreachable code");
+  }
+
+  public ILoggerFactory getLoggerFactory() {
+    return InternalDefaultLoggerFactory.getILoggerFactory();
+  }
+
+  public String getLoggerFactoryClassStr() {
+    return InternalDefaultLoggerFactory.getILoggerFactory().toString();
   }
 
   

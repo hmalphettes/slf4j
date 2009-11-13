@@ -22,21 +22,24 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.slf4j;
+package org.slf4j.osgi;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.osgi.framework.FrameworkUtil;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
 import org.slf4j.helpers.SubstituteLoggerFactory;
+import org.slf4j.spi.LoggerFactoryBinder;
 
 /**
  * This implementation of the StaticLoggerBinder is actually pluggable.
  * 
  * @author Hugues Malphettes
  */
-public class OSGiStaticLoggerBinder extends AbstractStaticLoggerBinder {
+public class OSGiStaticLoggerBinder implements LoggerFactoryBinder {
   
   private static String actualClassStr;
   private static ILoggerFactory ACTUAL_LOGGER_FACTORY = new SubstituteLoggerFactory();
@@ -62,17 +65,14 @@ public class OSGiStaticLoggerBinder extends AbstractStaticLoggerBinder {
     
     System.err.println("Setting up " + actualBinderClass.getName() + " from bundle "
         + FrameworkUtil.getBundle(actualBinderClass));
+    
     try {
       //static method getSingleton
       Method getSingleton = actualBinderClass.getMethod("getSingleton", new Class[0]);
-      Object actualSingleton = getSingleton.invoke(actualBinderClass, null);
+      LoggerFactoryBinder actualSingleton = (LoggerFactoryBinder) getSingleton.invoke(actualBinderClass, null);
       
-      //now invoke the various methods
-      Method getLoggerFactoryClassStr = actualBinderClass.getMethod("getLoggerFactoryClassStr", new Class[0]);
-      actualClassStr = (String) getLoggerFactoryClassStr.invoke(actualSingleton, null);
-      
-      Method getLoggerFactory = actualBinderClass.getMethod("getLoggerFactory", new Class[0]);
-      ACTUAL_LOGGER_FACTORY = (ILoggerFactory) getLoggerFactory.invoke(actualSingleton, null);
+      actualClassStr = (String) actualSingleton.getLoggerFactoryClassStr();
+      ACTUAL_LOGGER_FACTORY = (ILoggerFactory) actualSingleton.getLoggerFactory();
       
       Field apiVersionField = actualBinderClass.getField("REQUESTED_API_VERSION");
       REQUESTED_API_VERSION = (String) apiVersionField.get(actualBinderClass);
@@ -114,16 +114,16 @@ public class OSGiStaticLoggerBinder extends AbstractStaticLoggerBinder {
   public OSGiStaticLoggerBinder() {
   }
 
-  protected ILoggerFactory internalGetILoggerFactory() {
-    return ACTUAL_LOGGER_FACTORY;
-  }
-
   public String getLoggerFactoryClassStr() {
     return actualClassStr;
   }
 
   public Logger getLogger(String name) {
-    return internalGetILoggerFactory().getLogger(name);
+    return getLoggerFactory().getLogger(name);
+  }
+
+  public ILoggerFactory getLoggerFactory() {
+    return ACTUAL_LOGGER_FACTORY;
   }
 
 }

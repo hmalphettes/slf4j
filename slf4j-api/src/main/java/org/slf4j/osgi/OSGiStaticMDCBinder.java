@@ -2,9 +2,9 @@ package org.slf4j.osgi;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.osgi.framework.FrameworkUtil;
-import org.slf4j.impl.StaticMDCBinder;
 import org.slf4j.spi.MDCAdapter;
 
 
@@ -13,7 +13,7 @@ import org.slf4j.spi.MDCAdapter;
  *
  * @author Hugues Malphettes
  */
-public class OSGiStaticMDCBinder extends StaticMDCBinder {
+public class OSGiStaticMDCBinder implements MDCAdapter {
 
   /**
    * The unique instance of this class.
@@ -35,7 +35,6 @@ public class OSGiStaticMDCBinder extends StaticMDCBinder {
     
     System.err.println("Setting up " + actualMDCBinderClass.getName() + " from bundle "
         + FrameworkUtil.getBundle(actualMDCBinderClass));
-    
     
     try {
       Field singleton = actualMDCBinderClass.getField("SINGLETON");
@@ -76,6 +75,30 @@ public class OSGiStaticMDCBinder extends StaticMDCBinder {
   
   public String  getMDCAdapterClassStr() {
     return CURRENT_MDC_ADAPTER_CLASS_STR;
+  }
+
+  public void clear() {
+    CURRENT_MDC_ADAPTER.clear();
+  }
+
+  public String get(String key) {
+    return CURRENT_MDC_ADAPTER.get(key);
+  }
+
+  public Map getCopyOfContextMap() {
+    return CURRENT_MDC_ADAPTER.getCopyOfContextMap();
+  }
+
+  public void put(String key, String val) {
+    CURRENT_MDC_ADAPTER.put(key, val);
+  }
+
+  public void remove(String key) {
+    CURRENT_MDC_ADAPTER.remove(key);
+  }
+
+  public void setContextMap(Map contextMap) {
+    CURRENT_MDC_ADAPTER.setContextMap(contextMap);
   }
   
 }

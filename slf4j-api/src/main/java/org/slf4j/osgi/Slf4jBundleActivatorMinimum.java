@@ -39,7 +39,6 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
-import org.slf4j.OSGiStaticLoggerBinder;
 import org.slf4j.helpers.Util;
 import org.slf4j.impl.StaticLoggerBinder;
 

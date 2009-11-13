@@ -63,10 +63,8 @@ public class MDC {
 
   static final String NULL_MDCA_URL = "http://www.slf4j.org/codes.html#null_MDCA";
   static final String NO_STATIC_MDC_BINDER_URL = "http://www.slf4j.org/codes.html#no_static_mdc_binder";
-//  static MDCAdapter mdcAdapter;
+  static MDCAdapter mdcAdapter;
   
-  private static StaticMDCBinder mdcBinder;
-
   private MDC() {
   }
 
@@ -77,14 +75,14 @@ public class MDC {
       //we are in OSGi, plug the 'other' StaticLoggerBinder
       Class oSGiStaticMarkerBinderClass = MDC.class.getClassLoader().loadClass(
           "org.slf4j.osgi.OSGiStaticMDCBinder");
-      mdcBinder = (StaticMDCBinder) oSGiStaticMarkerBinderClass.newInstance();
-//      Field singleton = oSGiStaticMarkerBinderClass.getField("SINGLETON");
-//      mdcBinder = (StaticMDCBinder) singleton.get(oSGiStaticMarkerBinderClass);
+//      mdcAdapter = (MDCAdapter) oSGiStaticMarkerBinderClass.newInstance();
+      Field singleton = oSGiStaticMarkerBinderClass.getField("SINGLETON");
+      mdcAdapter = (MDCAdapter) singleton.get(oSGiStaticMarkerBinderClass);
     } catch (Throwable t) {
       //osgi debug
       t.printStackTrace();
       try {
-        /*mdcAdapter = */StaticMDCBinder.SINGLETON.getMDCA();
+        mdcAdapter = StaticMDCBinder.SINGLETON.getMDCA();
       } catch (NoClassDefFoundError ncde) {
         String msg = ncde.getMessage();
         if (msg != null && msg.indexOf("org/slf4j/impl/StaticMDCBinder") != -1) {
@@ -118,7 +116,7 @@ public class MDC {
     if (key == null) {
       throw new IllegalArgumentException("key parameter cannot be null");
     }
-    MDCAdapter mdcAdapter = mdcBinder.getMDCA();
+
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);
@@ -139,7 +137,7 @@ public class MDC {
     if (key == null) {
       throw new IllegalArgumentException("key parameter cannot be null");
     }
-    MDCAdapter mdcAdapter = mdcBinder.getMDCA();
+
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);
@@ -159,7 +157,7 @@ public class MDC {
     if (key == null) {
       throw new IllegalArgumentException("key parameter cannot be null");
     }
-    MDCAdapter mdcAdapter = mdcBinder.getMDCA();
+
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);
@@ -171,7 +169,6 @@ public class MDC {
    * Clear all entries in the MDC of the underlying implementation.
    */
   public static void clear() {
-    MDCAdapter mdcAdapter = mdcBinder.getMDCA();
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);
@@ -187,7 +184,6 @@ public class MDC {
    * @since 1.5.1
    */
   public static Map getCopyOfContextMap() {
-    MDCAdapter mdcAdapter = mdcBinder.getMDCA();
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);
@@ -204,7 +200,6 @@ public class MDC {
    * @since 1.5.1
    */
   public static void setContextMap(Map contextMap) {
-    MDCAdapter mdcAdapter = mdcBinder.getMDCA();
     if (mdcAdapter == null) {
       throw new IllegalStateException("MDCAdapter cannot be null. See also "
           + NULL_MDCA_URL);
@@ -220,7 +215,6 @@ public class MDC {
    * @since 1.4.2
    */
   public static MDCAdapter getMDCAdapter() {
-    MDCAdapter mdcAdapter = mdcBinder.getMDCA();
     return mdcAdapter;
   }
   

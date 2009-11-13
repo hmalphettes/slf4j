@@ -24,7 +24,7 @@
 
 package org.slf4j;
 
-
+import org.slf4j.spi.LoggerFactoryBinder;
 
 /**
  * The <code>LoggerFactory</code> is a utility class producing Loggers for
@@ -45,7 +45,7 @@ package org.slf4j;
  */
 public final class LoggerFactory {
   
-  private static AbstractStaticLoggerBinder loggerFactoryWrapper = null;
+  private static LoggerFactoryBinder loggerFactoryWrapper = null;
   
   // private constructor prevents instantiation
   private LoggerFactory() {}
@@ -54,14 +54,14 @@ public final class LoggerFactory {
       //see if we are inside OSGi.
       Class.forName("org.osgi.framework.Bundle");
       //we are in OSGi, plug the 'other' StaticLoggerBinder
-      loggerFactoryWrapper = (AbstractStaticLoggerBinder) LoggerFactory.class.getClassLoader().loadClass(
+      loggerFactoryWrapper = (LoggerFactoryBinder) LoggerFactory.class.getClassLoader().loadClass(
           "org.slf4j.OSGiStaticLoggerBinder").newInstance();
     } catch (Throwable t) {
       //debugging osgi:
       t.printStackTrace();
       //use the default java one:
       try {
-        loggerFactoryWrapper = (AbstractStaticLoggerBinder) Class.forName(
+        loggerFactoryWrapper = (LoggerFactoryBinder) Class.forName(
           "org.slf4j.InternalDefaultLoggerFactory").newInstance();
       } catch (Throwable e) {
         //fatal...
@@ -122,7 +122,7 @@ public final class LoggerFactory {
    * @return the ILoggerFactory instance in use
    */
   public static ILoggerFactory getILoggerFactory() {
-    return loggerFactoryWrapper.internalGetILoggerFactory();
+    return loggerFactoryWrapper.getLoggerFactory();
   }
   
 }
