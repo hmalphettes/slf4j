@@ -10,5 +10,5 @@ Export-Package: org.slf4j;version=1.5.9,
  org.slf4j.helpers;version=1.5.9
 Import-Package: org.osgi.framework,
  org.osgi.service.packageadmin
-Bundle-Activator: org.slf4j.impl.Slf4jBundleActivatorMinimum
+Bundle-Activator: org.slf4j.impl.PluggableSlf4jImplSupportBundleActivator
 Bundle-ActivationPolicy: lazy

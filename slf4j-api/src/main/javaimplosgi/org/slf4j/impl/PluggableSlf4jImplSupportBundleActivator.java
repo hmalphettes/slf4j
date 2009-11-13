@@ -37,12 +37,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.slf4j.helpers.Util;
+import org.slf4j.helpers.osgi.Slf4jBundleActivator;
 import org.slf4j.impl.StaticLoggerBinder;
 
 /**
  * Class called when the slf4j-api bundle is started and stoppped.
- * Please note that as this is in fact packaged in a fragment it is needed to
- * invoke it from the real BundleActivator of slf4j-api bundle.
+ * Please note that when this is in fact packaged in a fragment it is needed to
+ * invoke it from the real BundleActivator of slf4j-api bundle: {@link Slf4jBundleActivator}
  * <p>
  * This implementation is the shortest path to be remove the cyclic dependency
  * as reported in this bug: http://bugzilla.slf4j.org/show_bug.cgi?id=75
@@ -58,7 +59,7 @@ import org.slf4j.impl.StaticLoggerBinder;
  * 
  * @author Hugues Malphettes
  */
-public class Slf4jBundleActivatorMinimum implements BundleActivator {
+public class PluggableSlf4jImplSupportBundleActivator implements BundleActivator {
   
   private ServiceListener packageAdminServiceTracker;
   private Bundle currentProviderOfSlf4jImpl;
@@ -249,7 +250,7 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
    * @return true when the passed bundle is in fact the current slf4j-api bundle.
    */
   private boolean isThisBundle(Bundle bundle) {
-    return bundle == FrameworkUtil.getBundle(Slf4jBundleActivatorMinimum.class);
+    return bundle == FrameworkUtil.getBundle(PluggableSlf4jImplSupportBundleActivator.class);
   }
    
 }
