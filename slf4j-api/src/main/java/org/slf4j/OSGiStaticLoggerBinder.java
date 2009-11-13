@@ -36,7 +36,7 @@ import org.slf4j.helpers.SubstituteLoggerFactory;
  * 
  * @author Hugues Malphettes
  */
-public class OSGiStaticLoggerBinder extends AbstractLoggerFactoryWrapper {
+public class OSGiStaticLoggerBinder extends AbstractStaticLoggerBinder {
   
   private static String actualClassStr;
   private static ILoggerFactory ACTUAL_LOGGER_FACTORY = new SubstituteLoggerFactory();

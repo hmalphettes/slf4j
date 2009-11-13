@@ -39,7 +39,8 @@ public class TestBundleActivator implements BundleActivator {
     loggingThread = new Thread() {
       public void run() {
         while (true) {
-          System.err.println("Trying to log");
+          ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
+          System.err.println("Trying to log with " + loggerFactory);
           log.info("the time is {}", DateFormat.getTimeInstance().format(
               new Date()));
           try {

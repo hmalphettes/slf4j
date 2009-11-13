@@ -79,8 +79,7 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
     if (packageAdmin != null) {
       //this is the general case: the osgi framework does setup the PackageAdmin
       //early before slf4j-api is activated.
-      Class actualBinderClass = discoverAndInstallSlf4jImpl(packageAdmin);
-      OSGiStaticLoggerBinder.setup(actualBinderClass);
+      setupSlf4jImpl(packageAdmin);
     } else {
       //not the case is general,
       //a service tracker will be called back when the PackageAdmin is ready.
@@ -90,8 +89,7 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
           if (event.getType() == ServiceEvent.REGISTERED) {
             PackageAdmin packageAdmin = (PackageAdmin)context.getService(
                 event.getServiceReference());
-            Class actualBinderClass = discoverAndInstallSlf4jImpl(packageAdmin);
-            OSGiStaticLoggerBinder.setup(actualBinderClass);
+            setupSlf4jImpl(packageAdmin);
           }
         }
       };
@@ -106,8 +104,7 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
             for (int i = 0; i < exp.length; i++) {
               ExportedPackage ex = exp[i];
               if (ex.getName().equals("org.slf4j.impl")) {
-                Class actualBinderClass = load(event.getBundle());
-                OSGiStaticLoggerBinder.setup(actualBinderClass);
+                setupSlf4jImpl(event.getBundle());
                 break;
               }
             }
@@ -147,7 +144,52 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
    * @param packageAdmin The packageAdmin
    * @return a {@link StaticLoggerBinder} if indeed an implementation of slf4j was discovered and loaded
    */
-  private Class discoverAndInstallSlf4jImpl(PackageAdmin packageAdmin) {
+  private boolean setupSlf4jImpl(PackageAdmin packageAdmin) {
+    Bundle slf4jImpl = discoverAndInstallSlf4jImpl(packageAdmin);
+    return setupSlf4jImpl(slf4jImpl);
+  }
+  
+  private boolean setupSlf4jImpl(Bundle slf4jImpl) {
+    if (slf4jImpl == null) {
+      return false;
+    }
+    if (slf4jImpl.getState() == Bundle.RESOLVED) {
+      try {
+        slf4jImpl.start();
+      } catch (BundleException e) {
+        Util.reportFailure("Unable to start the bundle " + slf4jImpl.getSymbolicName(), e);
+        return false;
+      }
+    }
+    try {
+      Class loggerBinder = slf4jImpl.loadClass("org.slf4j.impl.StaticLoggerBinder");
+      OSGiStaticLoggerBinder.setup(loggerBinder);
+    } catch (ClassNotFoundException e) {
+      Util.reportFailure("Unable to load org.slf4j.impl.StaticLoggerBinder from bundle " + slf4jImpl.getSymbolicName(), e);
+      return false;
+    }
+    try {
+      Class mdcBinder = slf4jImpl.loadClass("org.slf4j.impl.StaticMDCBinder");
+      OSGiStaticMDCBinder.setup(mdcBinder);
+    } catch (ClassNotFoundException e) {
+      Util.reportFailure("Unable to load org.slf4j.impl.StaticMDCBinder from bundle " + slf4jImpl.getSymbolicName(), e);
+      return false;
+    }
+    try {
+      Class markerBinder = slf4jImpl.loadClass("org.slf4j.impl.StaticMarkerBinder");
+      OSGiStaticMarkerBinder.setup(markerBinder);
+    } catch (ClassNotFoundException e) {
+      Util.reportFailure("Unable to load org.slf4j.impl.StaticMarkerBinder from bundle " + slf4jImpl.getSymbolicName(), e);
+      return false;
+    }
+    return true;
+  }
+  
+  /**
+   * @param packageAdmin
+   * @return The bundle that is an slf4jimpl or null.
+   */
+  private Bundle discoverAndInstallSlf4jImpl(PackageAdmin packageAdmin) {
     ExportedPackage[] implementations = packageAdmin.getExportedPackages("org.slf4j.impl");
 
     //no bundle aka no implementation installed at this time.
@@ -166,10 +208,11 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
         //it is not present at runtime.
         return null;
       }
-      return load(exportingbundle);
+      return exportingbundle;
     }
     
     //collect the bundles that provide slf4j and can be started.
+    //err... right now just take the first one...
     List slf4jImplProviders = new ArrayList();
     for (int i = 0; i < implementations.length; i++) {
       ExportedPackage ep = implementations[i];
@@ -184,7 +227,7 @@ public class Slf4jBundleActivatorMinimum implements BundleActivator {
             || exportingbundle.getState() == Bundle.STARTING) {
         //this bundle is resolved: it means all its dependencies are available
         //and it can be started.
-        return load(exportingbundle);
+        return exportingbundle;
       }
     }
     

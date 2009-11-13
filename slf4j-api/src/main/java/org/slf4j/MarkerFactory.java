@@ -24,8 +24,11 @@
 
 package org.slf4j;
 
+import java.lang.reflect.Field;
+
 import org.slf4j.helpers.Util;
 import org.slf4j.impl.StaticMarkerBinder;
+import org.slf4j.spi.MarkerFactoryBinder;
 
 /**
  * MarkerFactory is a utility class producing {@link Marker} instances as
@@ -41,18 +44,37 @@ import org.slf4j.impl.StaticMarkerBinder;
  * @author Ceki G&uuml;lc&uuml;
  */
 public class MarkerFactory {
-  static IMarkerFactory markerFactory;
 
+  static MarkerFactoryBinder STATIC_MARKER_FACTORY_BINDER;
+  
   private MarkerFactory() {
   }
 
   static {
     try {
-      markerFactory = StaticMarkerBinder.SINGLETON.getMarkerFactory();
-    } catch (Exception e) {
-      // we should never get here
-      Util.reportFailure("Could not instantiate instance of class ["
-          + StaticMarkerBinder.SINGLETON.getMarkerFactoryClassStr() + "]", e);
+      //see if we are inside OSGi.
+      Class.forName("org.osgi.framework.Bundle");
+      //we are in OSGi, plug the 'other' StaticLoggerBinder
+      Class oSGiStaticMarkerBinderClass = MarkerFactory.class.getClassLoader().loadClass(
+          "org.slf4j.osgi.OSGiStaticMarkerBinder");
+      Field singleton = oSGiStaticMarkerBinderClass.getField("SINGLETON");
+      STATIC_MARKER_FACTORY_BINDER =
+          (MarkerFactoryBinder) singleton.get(oSGiStaticMarkerBinderClass);
+    } catch (Throwable t) {
+      //debugging osgi:
+      t.printStackTrace();
+
+      //use the default java one:
+      try {
+        //Should we use reflection to make sure this class will not depend on
+        //org.slf4j.impl at runtime ?
+        STATIC_MARKER_FACTORY_BINDER = StaticMarkerBinder.SINGLETON;
+//        STATIC_MARKER_FACTORY_BINDER.getMarkerFactory();
+      } catch (Exception e) {
+        // we should never get here
+        Util.reportFailure("Could not instantiate instance of class ["
+            + StaticMarkerBinder.SINGLETON.getMarkerFactoryClassStr() + "]", e);
+      }
     }
   }
 
@@ -65,7 +87,7 @@ public class MarkerFactory {
    * @return marker
    */
   public static Marker getMarker(String name) {
-    return markerFactory.getMarker(name);
+    return getIMarkerFactory().getMarker(name);
   }
 
   /**
@@ -75,7 +97,7 @@ public class MarkerFactory {
    * @since 1.5.1
    */
   public static Marker getDetachedMarker(String name) {
-    return markerFactory.getDetachedMarker(name);
+    return getIMarkerFactory().getDetachedMarker(name);
   }
   
   /**
@@ -87,6 +109,6 @@ public class MarkerFactory {
    * @return the IMarkerFactory instance in use
    */
   public static IMarkerFactory getIMarkerFactory() {
-    return markerFactory;
+    return STATIC_MARKER_FACTORY_BINDER.getMarkerFactory();
   }
 }

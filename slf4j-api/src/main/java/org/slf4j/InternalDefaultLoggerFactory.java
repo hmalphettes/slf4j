@@ -43,7 +43,7 @@ import org.slf4j.impl.StaticLoggerBinder;
  * @author Ceki G&uuml;lc&uuml;
  * @author Robert Elliot
  */
-class InternalDefaultLoggerFactory extends AbstractLoggerFactoryWrapper {
+class InternalDefaultLoggerFactory extends AbstractStaticLoggerBinder {
   
   static final String NO_STATICLOGGERBINDER_URL = "http://www.slf4j.org/codes.html#StaticLoggerBinder";
   static final String MULTIPLE_BINDINGS_URL = "http://www.slf4j.org/codes.html#multiple_bindings";

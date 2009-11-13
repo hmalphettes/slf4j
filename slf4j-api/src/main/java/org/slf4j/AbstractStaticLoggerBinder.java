@@ -4,7 +4,7 @@ package org.slf4j;
  * Internal class. 
  * @author hmalphettes
  */
-abstract class AbstractLoggerFactoryWrapper {
+abstract class AbstractStaticLoggerBinder {
 
   /**
    * @return The actual ILoggerFactory
