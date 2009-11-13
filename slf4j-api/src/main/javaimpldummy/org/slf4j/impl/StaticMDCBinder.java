@@ -17,8 +17,8 @@ public class StaticMDCBinder {
    */
   public static final StaticMDCBinder SINGLETON = new StaticMDCBinder();
 
-  protected StaticMDCBinder() {
-    //throw new UnsupportedOperationException("This code should never make it into the jar");
+  private StaticMDCBinder() {
+    throw new UnsupportedOperationException("This code should never make it into the jar");
   }
   
   /**

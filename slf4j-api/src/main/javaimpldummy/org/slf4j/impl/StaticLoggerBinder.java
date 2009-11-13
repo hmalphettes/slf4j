@@ -25,7 +25,6 @@
 package org.slf4j.impl;
 
 import org.slf4j.ILoggerFactory;
-import org.slf4j.spi.LoggerFactoryBinder;
 
 /**
  * The binding of {@link LoggerFactory} class with an actual instance of
@@ -37,7 +36,7 @@ import org.slf4j.spi.LoggerFactoryBinder;
  * 
  * @author Ceki G&uuml;lc&uuml;
  */
-public class StaticLoggerBinder implements LoggerFactoryBinder {
+public class StaticLoggerBinder {
  
   /**
    * The unique instance of this class.
