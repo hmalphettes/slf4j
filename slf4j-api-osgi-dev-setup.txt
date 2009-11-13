@@ -1,0 +1,31 @@
+slf4j-api-on-osgi
+
+== setup of the dev environment
+
+1- checkout the osgi-binder branch of http://github.com/hmalphettes/slf4j
+2- Rename the osgi.classpath and .osgi.project files of slf4j-osgi-other-test-bundle and slf4j-api into .claspath and .project.
+3- Download eclipse-SDK-3.6-M3
+4- Open eclipse-SDK 
+5- Import.../Existing Plugins and Fragments... / import logback-core and logback-classic as "Binary Projects"
+The version I am testing with is the latest build of logback trunk with the patch attached here: http://jira.qos.ch/browse/LBCLASSIC-168 applied
+6- Import as existing project slf4j-osgi-other-test-bundle and slf4j-api
+7- The 2 imported projects must compile correctly.
+8- Menu "Run/Run Configuration..../" select the entry called "slf4j-osgi-test". Choose the tab "Arguments".
+In the "VM Arguments" text-area, change: -Dlogback.configurationFile=/home/hmalphettes/proj/osgi-experiments/slf4j-osgi/logback-dev.xml to path to a logback config file with INFO enabled by default.
+9- Run or debug with this configuration.
+The console of eclipse-PDE should appear and print this type of things:
+osgi> Setting up org.slf4j.impl.StaticLoggerBinder from bundle ch.qos.logback.classic_0.9.18.SNAPSHOT [4]
+Setting up org.slf4j.impl.StaticMDCBinder from bundle ch.qos.logback.classic_0.9.18.SNAPSHOT [4]
+Setting up org.slf4j.impl.StaticMarkerBinder from bundle ch.qos.logback.classic_0.9.18.SNAPSHOT [4]
+ch.qos.logback.classic.LoggerContext[default]
+2009-11-13 13:32:47,439 INFO  [org.slf4j.osgi.testbundle.TestBundleActivator] [Thread-2] the time is 1:32:47 PM
+Trying to log with ch.qos.logback.classic.LoggerContext[default]
+2009-11-13 13:32:52,443 INFO  [org.slf4j.osgi.testbundle.TestBundleActivator] [Thread-2] the time is 1:32:52 PM
+Trying to log with ch.qos.logback.classic.LoggerContext[default]
+2009-11-13 13:32:57,444 INFO  [org.slf4j.osgi.testbundle.TestBundleActivator] [Thread-2] the time is 1:32:57 PM
+Trying to log with ch.qos.logback.classic.LoggerContext[default]
+2009-11-13 13:33:02,445 INFO  [org.slf4j.osgi.testbundle.TestBundleActivator] [Thread-2] the time is 1:33:02 PM
+Trying to log with ch.qos.logback.classic.LoggerContext[default]
+
+
+

@@ -9,7 +9,7 @@ import org.slf4j.spi.MDCAdapter;
 
 
 /**
- * Just a facade for the StaticMDCBinder is actually pluggable.
+ * A StaticMDCBinder that is actually pluggable.
  * It is called back by the BundleListener when an implementation of slf4j is started
  * in the osgi container.
  *
@@ -22,14 +22,11 @@ public class StaticMDCBinder implements MDCAdapter {
    */
   public static final StaticMDCBinder SINGLETON = new StaticMDCBinder();
   
-//  private static Object ACTUAL_MDC_BINDER;
-  
   private static MDCAdapter CURRENT_MDC_ADAPTER;
   private static String CURRENT_MDC_ADAPTER_CLASS_STR;
 
   public static void setup(Class actualMDCBinderClass) {
     if (actualMDCBinderClass == null) {
-//      ACTUAL_MDC_BINDER = null;
       CURRENT_MDC_ADAPTER = null;
       CURRENT_MDC_ADAPTER_CLASS_STR = null;
       return;

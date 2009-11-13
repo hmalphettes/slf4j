@@ -53,8 +53,7 @@ import org.slf4j.impl.StaticLoggerBinder;
  * the implementation slf4j should use.
  * </p>
  * <p>
- * This implementation does not support dynamic plugging/removal of new slf4j
- * implementations.
+ * If no implementations are found  
  * </p>
  * 
  * @author Hugues Malphettes
