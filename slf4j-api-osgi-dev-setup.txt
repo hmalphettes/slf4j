@@ -3,8 +3,8 @@ slf4j-api-on-osgi
 == setup of the dev environment
 
 1- checkout the osgi-binder branch of http://github.com/hmalphettes/slf4j
-2- Rename the osgi.classpath and .osgi.project files of slf4j-osgi-other-test-bundle and slf4j-api into .claspath and .project.
-3- Download eclipse-SDK-3.6-M3
+2- Rename the osgi.classpath and osgi.project files of slf4j-osgi-other-test-bundle and slf4j-api into .classpath and .project
+3- Download eclipse-SDK-3.6-M3 (it should work with eclipse-3.5 too: this is all basic osgi and depends a single jar org.eclipse.osgi-v.jar. I recommend using a separate version of eclipse though.)
 4- Open eclipse-SDK 
 5- Import.../Existing Plugins and Fragments... / import logback-core and logback-classic as "Binary Projects"
 The version I am testing with is the latest build of logback trunk with the patch attached here: http://jira.qos.ch/browse/LBCLASSIC-168 applied
