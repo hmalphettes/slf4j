@@ -1,0 +1,10 @@
+Implementation-Title: slf4j-api-osgi
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: slf4j.api.osgi
+Fragment-Host: slf4j.api
+Bundle-Name: slf4j-api-osgi
+Bundle-Vendor: SLF4J.ORG
+Bundle-Version: 1.5.9
+Bundle-RequiredExecutionEnvironment: J2SE-1.3
+Import-Package: org.osgi.framework,
+ org.osgi.service.packageadmin

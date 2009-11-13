@@ -1,0 +1,14 @@
+Implementation-Title: slf4j-osgi-testbundle
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.slf4j.osgi.testbundle
+Bundle-Name: slf4j-osgi-testbundle
+Bundle-Vendor: SLF4J.ORG
+Bundle-Version: 1.5.9
+Bundle-RequiredExecutionEnvironment: J2SE-1.3
+Import-Package: ch.qos.logback.classic,
+ ch.qos.logback.core.util,
+ org.osgi.framework,
+ org.slf4j
+Bundle-Activator: org.slf4j.osgi.testbundle.TestBundleActivator
+Require-Bundle: ch.qos.logback.classic;bundle-version="0.9.18",
+ ch.qos.logback.core;bundle-version="0.9.18"

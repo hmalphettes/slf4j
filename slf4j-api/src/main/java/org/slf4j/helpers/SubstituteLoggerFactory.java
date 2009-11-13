@@ -52,6 +52,10 @@ import org.slf4j.Logger;
  */
 public class SubstituteLoggerFactory implements ILoggerFactory {
 
+  public SubstituteLoggerFactory() {
+//    Thread.dumpStack();
+  }
+  
   // keep a record of requested logger names
   final List loggerNameList = new ArrayList();
 
