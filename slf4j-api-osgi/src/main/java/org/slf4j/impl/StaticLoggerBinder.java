@@ -100,14 +100,14 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
   }
   
   private static String getDefaultVersion() {
-    return FrameworkUtil.getBundle(PluggableSlf4jImplSupportBundleActivator.class)
+    return FrameworkUtil.getBundle(PluggableSlf4jImplSupport.class)
         .getVersion().toString();
   }
  
   /**
-   * The unique instance of this class.
+   * The unique instance of this class. getSingleton() will be called by the framework instead.
    */
-  public static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
+  public static StaticLoggerBinder SINGLETON;
   
   /**
    * Return the singleton of this class.
@@ -115,11 +115,22 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
    * @return the StaticLoggerBinder singleton
    */
   public static final StaticLoggerBinder getSingleton() {
+    if (SINGLETON == null) {
+      SINGLETON = new StaticLoggerBinder();
+    }
     return SINGLETON;
   }
   
   private StaticLoggerBinder() {
     REQUESTED_API_VERSION = getDefaultVersion();
+    if (PluggableSlf4jImplSupport.current == null) {
+      PluggableSlf4jImplSupport startSupport = new PluggableSlf4jImplSupport();
+      try {
+        startSupport.setup(FrameworkUtil.getBundle(PluggableSlf4jImplSupport.class).getBundleContext());
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   public String getLoggerFactoryClassStr() {

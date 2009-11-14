@@ -5,21 +5,32 @@
   <parent>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-parent</artifactId>
-    <version>1.5.9-SNAPSHOT</version>
+    <version>1.5.9.RC1</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.slf4j</groupId>
-  <artifactId>slf4j-api</artifactId>
+  <artifactId>slf4j-api-osgi</artifactId>
   <packaging>jar</packaging>
-  <name>SLF4J API Module</name>
+  <name>SLF4J API OSGi Module</name>
 
   <url>http://www.slf4j.org</url>
-  <description>The slf4j API</description>
+  <description>Pluggable implementations of slf4j.impl in OSGi</description>
 
   <dependencies>
-
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>osgi</artifactId>
+      <version>${osgi-version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies> 
 
   <build>
@@ -44,11 +55,10 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
               <Bundle-Description>${project.description}</Bundle-Description>
               <Implementation-Version>${project.version}</Implementation-Version>
             </manifestEntries>
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+            <manifestFile>target/MANIFEST.MF</manifestFile>
           </archive>
         </configuration>
         <executions>
@@ -76,9 +86,22 @@
         </executions>
         <configuration>
           <tasks>
-            <echo>Removing slf4j-api's dummy StaticLoggerBinder and StaticMarkerBinder</echo>
-            <delete dir="target/classes/org/slf4j/impl"/>
+            <copy file="META-INF/MANIFEST.MF" tofile="target/MANIFEST.MF"/>
+            <replace file="target/MANIFEST.MF" token="1.5.9.qualifier" value="${project.version}"/>
           </tasks>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <manifest>prevent/overwriting/by/pointing/to/nonexisting/MANIFEST.MF</manifest>
+          <pde>true</pde>
+          <downloadSources>true</downloadSources>
+          <sourceExcludes>
+            <sourceExclude>**/.svn/**</sourceExclude>
+          </sourceExcludes>
         </configuration>
       </plugin>
 

@@ -37,13 +37,10 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.slf4j.helpers.Util;
-import org.slf4j.helpers.osgi.Slf4jBundleActivator;
-import org.slf4j.impl.StaticLoggerBinder;
 
 /**
- * Class called when the slf4j-api bundle is started and stoppped.
- * Please note that when this is in fact packaged in a fragment it is needed to
- * invoke it from the real BundleActivator of slf4j-api bundle: {@link Slf4jBundleActivator}
+ * Listens to internal event of the OSGi framework to pulg/unplug slf4j
+ * implementations as they are activated.
  * <p>
  * This implementation is the shortest path to be remove the cyclic dependency
  * as reported in this bug: http://bugzilla.slf4j.org/show_bug.cgi?id=75
@@ -59,7 +56,9 @@ import org.slf4j.impl.StaticLoggerBinder;
  * 
  * @author Hugues Malphettes
  */
-public class PluggableSlf4jImplSupportBundleActivator implements BundleActivator {
+class PluggableSlf4jImplSupport implements BundleActivator {
+  
+  static PluggableSlf4jImplSupport current;
   
   private ServiceListener packageAdminServiceTracker;
   private Bundle currentProviderOfSlf4jImpl;
@@ -68,9 +67,15 @@ public class PluggableSlf4jImplSupportBundleActivator implements BundleActivator
    * Called when the slf4j bundle is activated
    * @param context The framework context.
    */
-  public void start(final BundleContext context) throws Exception {
-    //we should eventually set a static boolean somewhere so that the rest of
-    //slf4j-api knows that it is executed in an OSGi framework.
+  public void start(BundleContext context) throws Exception {
+    setup(context);
+  }
+  
+  void setup(final BundleContext context) throws Exception {
+    if (current != null) {
+      return;
+    }
+    current = this;
     
     //track other bundles and fragments attached to this bundle that we should activate.
     PackageAdmin packageAdmin = getPackageAdmin(context);
@@ -79,7 +84,8 @@ public class PluggableSlf4jImplSupportBundleActivator implements BundleActivator
       //early before slf4j-api is activated.
       setupSlf4jImpl(packageAdmin);
     } else {
-      //not the case is general,
+      //in general the PackageAdmin is setup and ready to be used early
+      //after the framework is started. looks like it is not the case.
       //a service tracker will be called back when the PackageAdmin is ready.
       //in the mean time no slf4j-impl is ready.
       packageAdminServiceTracker = new ServiceListener() {
@@ -88,9 +94,12 @@ public class PluggableSlf4jImplSupportBundleActivator implements BundleActivator
             PackageAdmin packageAdmin = (PackageAdmin)context.getService(
                 event.getServiceReference());
             setupSlf4jImpl(packageAdmin);
+            //no need to track one anymore.
+            context.removeServiceListener(packageAdminServiceTracker);
           }
         }
       };
+      context.addServiceListener(packageAdminServiceTracker,"(objectclass=" + PackageAdmin.class.getName() + ")");
     }
     BundleListener listener = new BundleListener() {
       public void bundleChanged(BundleEvent event) {
@@ -127,9 +136,11 @@ public class PluggableSlf4jImplSupportBundleActivator implements BundleActivator
    * @param context The framework context.
    */
   public void stop(BundleContext context) throws Exception {
-    if (packageAdminServiceTracker != null) {
-      context.removeServiceListener(packageAdminServiceTracker);
-    }
+    current = null;
+    //not useful: osgi will do it by itself.
+//    if (packageAdminServiceTracker != null) {
+//      context.removeServiceListener(packageAdminServiceTracker);
+//    }
   }
   
   /**
@@ -236,7 +247,7 @@ public class PluggableSlf4jImplSupportBundleActivator implements BundleActivator
             || exportingbundle.getState() == Bundle.ACTIVE
             || exportingbundle.getState() == Bundle.STARTING) {
         //this bundle is resolved: it means all its dependencies are available
-        //and it can be started.
+        //and it can be started if it is not started already.
         return exportingbundle;
       }
     }
@@ -250,7 +261,7 @@ public class PluggableSlf4jImplSupportBundleActivator implements BundleActivator
    * @return true when the passed bundle is in fact the current slf4j-api bundle.
    */
   private boolean isThisBundle(Bundle bundle) {
-    return bundle == FrameworkUtil.getBundle(PluggableSlf4jImplSupportBundleActivator.class);
+    return bundle == FrameworkUtil.getBundle(PluggableSlf4jImplSupport.class);
   }
    
 }
