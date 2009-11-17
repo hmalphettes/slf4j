@@ -12,11 +12,16 @@ design (currently):
 ===================
 - keep slf4j-api as is except for:
    - remove the import of org.slf4j.impl (aka remove the cyclic dependency) maybe make it optional if felix is happy with optional.
+   - add the entry: Bundle-ActivationPolicy: lazy
 - keep the current implementations of slf4j identical. this is will work for all slf4j-impl packaged as bundles
 - slf4j-api-osgi: new fragment hosted by slf4j-api provides a pluggable implementation of org.slf4j.impl
 it listens to bundles being started and stopped.
 when such a bundle provides an implementation of org.slf4j.impl it loads it and makes it the actual
 currently in used implementation.
+Currently it does not proxy the Logger: so if the bundle that provides the implementation is de-activated, the classes active that have their
+own reference to a Logger will keep using it. New classes that go through the LoggerFactory will get a newly plugged implementation of the Logger.
+
+We could choose to provide a complete proxying of the Logger.
 
 An alternative packaging would consists of generating an slf4j-api-with-osgi-impl.
 It would make one less jar in the osgi apps but it would prevent implementations that
