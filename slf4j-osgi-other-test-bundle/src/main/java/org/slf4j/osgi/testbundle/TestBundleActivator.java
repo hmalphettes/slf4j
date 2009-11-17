@@ -18,9 +18,26 @@ import ch.qos.logback.classic.LoggerContext;
  */
 public class TestBundleActivator implements BundleActivator {
 
-  private final Logger log = LoggerFactory.getLogger(TestBundleActivator.class);
+  //set to true to try the pluggable slf4jimpl
+  private static boolean alwaysGoThroughLoggerFactory = true;
+  
+  private static Logger log;// = LoggerFactory.getLogger(TestBundleActivator.class);
 
+  static {
+    if (!alwaysGoThroughLoggerFactory) {
+      log = LoggerFactory.getLogger(TestBundleActivator.class);
+    }
+  }
+  
   private Thread loggingThread;
+  
+  private static Logger getLogger() {
+    if (log == null) {
+      return LoggerFactory.getLogger(TestBundleActivator.class);
+    } else {
+      return log;
+    }
+  }
   
   /**
    * 
@@ -41,12 +58,12 @@ public class TestBundleActivator implements BundleActivator {
         while (true) {
           ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
           System.err.println("Trying to log with " + loggerFactory);
-          log.info("the time is {}", DateFormat.getTimeInstance().format(
+          getLogger().info("the time is {}", DateFormat.getTimeInstance().format(
               new Date()));
           try {
             sleep(5000);
           } catch (InterruptedException e) {
-            log.warn("interrupted", e);
+            getLogger().warn("interrupted", e);
           }
         }
       }

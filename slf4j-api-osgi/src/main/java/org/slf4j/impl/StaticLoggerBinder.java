@@ -126,7 +126,7 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
     if (PluggableSlf4jImplSupport.current == null) {
       PluggableSlf4jImplSupport startSupport = new PluggableSlf4jImplSupport();
       try {
-        startSupport.setup(FrameworkUtil.getBundle(PluggableSlf4jImplSupport.class).getBundleContext());
+        startSupport.setup(FrameworkUtil.getBundle(Logger.class).getBundleContext());
       } catch (Exception e) {
         e.printStackTrace();
       }

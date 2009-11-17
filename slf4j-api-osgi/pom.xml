@@ -99,9 +99,6 @@
           <manifest>prevent/overwriting/by/pointing/to/nonexisting/MANIFEST.MF</manifest>
           <pde>true</pde>
           <downloadSources>true</downloadSources>
-          <sourceExcludes>
-            <sourceExclude>**/.svn/**</sourceExclude>
-          </sourceExcludes>
         </configuration>
       </plugin>
 

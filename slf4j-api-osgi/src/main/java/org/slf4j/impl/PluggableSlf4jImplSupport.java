@@ -61,7 +61,7 @@ class PluggableSlf4jImplSupport implements BundleActivator {
   static PluggableSlf4jImplSupport current;
   
   private ServiceListener packageAdminServiceTracker;
-  private Bundle currentProviderOfSlf4jImpl;
+  private long currentProviderOfSlf4jImpl;
   
   /**
    * Called when the slf4j bundle is activated
@@ -103,6 +103,7 @@ class PluggableSlf4jImplSupport implements BundleActivator {
     }
     BundleListener listener = new BundleListener() {
       public void bundleChanged(BundleEvent event) {
+        System.err.println("bundle change " + event + " " + event.getBundle().getSymbolicName());
         switch (event.getType()) {
         case BundleEvent.STARTED:
           PackageAdmin packageAdmin = getPackageAdmin(event.getBundle().getBundleContext());
@@ -118,10 +119,11 @@ class PluggableSlf4jImplSupport implements BundleActivator {
           }
           break;
         case BundleEvent.STOPPING:
-          if (event.getBundle() == currentProviderOfSlf4jImpl) {
+        case BundleEvent.STOPPED:
+          if (event.getBundle().getBundleId() == currentProviderOfSlf4jImpl) {
             //uninstall
             System.err.println("uninstalling the current slf4jimpl provided by bundle "
-                + currentProviderOfSlf4jImpl.getSymbolicName());
+                + event.getBundle().getSymbolicName());
             uninstallSlf4jImpl();
           }
           break;
@@ -170,7 +172,7 @@ class PluggableSlf4jImplSupport implements BundleActivator {
   }
   
   private boolean setupSlf4jImpl(Bundle slf4jImpl) {
-    currentProviderOfSlf4jImpl = slf4jImpl;
+    currentProviderOfSlf4jImpl = slf4jImpl.getBundleId();
     if (slf4jImpl == null) {
       return false;
     }
